@@ -5,8 +5,12 @@ from app.models.score import Score
 from app.api.scores import router as scores_router
 from app.db import engine, Base, SessionLocal
 
-# Import models so SQLAlchemy knows they exist
+# Import ALL models so SQLAlchemy knows them
+from app.models.event import Event
 from app.models.heat import Heat
+from app.models.competitor import Competitor
+from app.models.heat_competitor import HeatCompetitor
+from app.models.judge import Judge
 from app.models.score import Score
 
 app = FastAPI()

@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, Float, ForeignKey
+from sqlalchemy import Column, Integer, Float, ForeignKey, DateTime
+from datetime import datetime
 from app.db import Base
 
 class Score(Base):
@@ -9,3 +10,4 @@ class Score(Base):
     competitor_id = Column(Integer)
     judge_id = Column(Integer)
     value = Column(Float)
+    timestamp = Column(DateTime, default=datetime.utcnow)
