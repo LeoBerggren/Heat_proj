@@ -2,8 +2,9 @@
 
 from fastapi import FastAPI, WebSocket
 from app.models.score import Score
-from app.api.scores import router as scores_router
 from app.db import engine, Base, SessionLocal
+from app.api.scores import router as scores_router
+from app.api.competitors import router as competitors_router
 
 # Import ALL models so SQLAlchemy knows them
 from app.models.event import Event
@@ -13,10 +14,12 @@ from app.models.heat_competitor import HeatCompetitor
 from app.models.judge import Judge
 from app.models.score import Score
 
+
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
 
 app.include_router(scores_router)
+app.include_router(competitors_router)
 
 @app.get("/")
 def root():
