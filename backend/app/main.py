@@ -5,6 +5,7 @@ from app.models.score import Score
 from app.db import engine, Base, SessionLocal
 from app.api.scores import router as scores_router
 from app.api.competitors import router as competitors_router
+from app.api.judges import router as judges_router
 
 # Import ALL models so SQLAlchemy knows them
 from app.models.event import Event
@@ -18,6 +19,7 @@ from app.models.score import Score
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
 
+app.include_router(judges_router)
 app.include_router(scores_router)
 app.include_router(competitors_router)
 
