@@ -1,0 +1,71 @@
+<!-- Main html dashboard file-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1 { margin-bottom: 10px; }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .section {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Admin Dashboard</h1>
+
+<div class="section">
+    <h2>Heat Controls</h2>
+    <label>Heat ID: <input id="heatId" type="number" value="1"></label><br><br>
+
+    <button onclick="startHeat()">Start Heat</button>
+    <button onclick="finishHeat()">Finish Heat</button>
+    <button onclick="refreshLeaderboard()">Force Leaderboard Update</button>
+</div>
+
+<div class="section">
+    <h2>Competitor Management</h2>
+    <button onclick="window.location='competitors.html'">Manage Competitors</button>
+</div>
+
+<div class="section">
+    <h2>Judge Management</h2>
+    <button onclick="window.location='judges.html'">Manage Judges</button>
+</div>
+
+<script>
+function startHeat() {
+    const id = document.getElementById("heatId").value;
+    fetch(`http://localhost:8000/heats/${id}/start`, { method: "POST" });
+}
+
+function finishHeat() {
+    const id = document.getElementById("heatId").value;
+    fetch(`http://localhost:8000/heats/${id}/finish`, { method: "POST" });
+}
+
+function refreshLeaderboard() {
+    const id = document.getElementById("heatId").value;
+    fetch(`http://localhost:8000/spectator/heat/${id}`)
+        .then(() => {
+            // Broadcast leaderboard update
+            fetch(`http://localhost:8000/admin/broadcast/leaderboard/${id}`, { method: "POST" });
+        });
+}
+</script>
+
+</body>
+</html>
