@@ -18,7 +18,7 @@ from app.api.websocket import router as websocket_router
 from app.api.spectator import router as spectators_router
 from app.api.admin import router as admin_router
 from app.api.admin_competitors import router as admin_competitors_router
-
+from app.api.admin_heats import router as admin_heats_router
 
 # Import ALL models so SQLAlchemy knows them
 from app.models.event import Event
@@ -40,6 +40,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(admin_heats_router)
 app.include_router(admin_competitors_router)
 app.include_router(spectators_router)
 app.include_router(heat_competitors_router)

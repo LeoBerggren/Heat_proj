@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Heat Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        input { padding: 8px; margin-right: 10px; }
+        button { padding: 8px 12px; cursor: pointer; }
+        table { margin-top: 20px; border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background: #eee; }
+    </style>
+</head>
+<body>
+
+<h1>Heat Management</h1>
+
+<div>
+    <input id="round" placeholder="Round name (e.g. Quarterfinal 1)">
+    <input id="start" type="datetime-local">
+    <input id="end" type="datetime-local">
+    <button onclick="createHeat()">Create Heat</button>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Round</th>
+            <th>Status</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody id="heatTable"></tbody>
+</table>
+
+<script>
+const API = "http://localhost:8000/admin/heats";
+
+function loadHeats() {
+    fetch(API)
+        .then(res => res.json())
+        .then(data => {
+            const table = document.getElementById("heatTable");
+            table.innerHTML = "";
+
+            data.forEach(h => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${h.id}</td>
+                    <td>${h.round}</td>
+                    <td>${h.status}</td>
+                    <td>${h.start_time || ""}</td>
+                    <td>${h.end_time || ""}</td>
+                    <td><button onclick="deleteHeat(${h.id})">Delete</button></td>
+                `;
+                table.appendChild(row);
+            });
+        });
+}
+
+function createHeat() {
+    const round = document.getElementById("round").value;
+    const start = document.getElementById("start").value;
+    const end = document.getElementById("end").value;
+
+    fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            round,
+            start_time: start || null,
+            end_time: end || null
+        })
+    }).then(() => {
+        document.getElementById("round").value = "";
+        loadHeats();
+    });
+}
+
+function deleteHeat(id) {
+    fetch(`${API}/${id}`, { method: "DELETE" })
+        .then(() => loadHeats());
+}
+
+loadHeats();
+</script>
+
+</body>
+</html>

@@ -61,11 +61,19 @@ class HeatBase(BaseModel):
     end_time: datetime | None = None
     status: str = "pending"
 
-class HeatCreate(HeatBase):
-    pass
+class HeatCreate(BaseModel):
+    round: str
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+    event_id: int | None = None   # optional for now
 
-class HeatRead(HeatBase):
+class HeatRead(BaseModel):
     id: int
+    event_id: int | None = None
+    round: str
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+    status: str
 
     class Config:
         orm_mode = True
