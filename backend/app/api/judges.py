@@ -10,7 +10,7 @@ router = APIRouter()
 # CREATE
 @router.post("/judges", response_model=JudgeRead)
 def create_judge(data: JudgeCreate, db: Session = Depends(get_db)):
-    judge = Judge(name=data.name, country=data.country)
+    judge = Judge(name=data.name)
     db.add(judge)
     db.commit()
     db.refresh(judge)
@@ -37,7 +37,6 @@ def update_judge(judge_id: int, data: JudgeCreate, db: Session = Depends(get_db)
         raise HTTPException(status_code=404, detail="Judge not found")
 
     judge.name = data.name
-    judge.country = data.country
 
     db.commit()
     db.refresh(judge)
