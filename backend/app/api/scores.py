@@ -34,6 +34,11 @@ async def submit_score(data: ScoreCreate, db: Session = Depends(get_db)):
             "timestamp": db_score.timestamp.isoformat()
         }
     })
+   # 2. Broadcast that the leaderboard should update
+    await manager.broadcast({
+        "type": "leaderboard_update",
+        "heat_id": db_score.heat_id
+    })
 
     return db_score
 

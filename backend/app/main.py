@@ -3,6 +3,9 @@
 from fastapi import FastAPI, WebSocket
 from app.models.score import Score
 from app.db import engine, Base, SessionLocal
+from fastapi.middleware.cors import CORSMiddleware
+
+
 
 #IMPORT ROUTERS
 from app.api.competitors import router as competitors_router
@@ -12,6 +15,8 @@ from app.api.heats import router as heats_router
 from app.api.heat_competitors import router as heat_competitors_router
 from app.api.scores import router as scores_router
 from app.api.websocket import router as websocket_router
+from app.api.spectator import router as spectators_router
+
 
 # Import ALL models so SQLAlchemy knows them
 from app.models.event import Event
@@ -25,6 +30,16 @@ from app.models.score import Score
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # allow all origins for development
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+app.include_router(spectators_router)
 app.include_router(heat_competitors_router)
 app.include_router(judges_router)
 app.include_router(scores_router)

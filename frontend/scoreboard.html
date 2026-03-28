@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Surf Heat Scoreboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f7ff;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 5px;
+        }
+        #leaderboard {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        #leaderboard th, #leaderboard td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+        #leaderboard th {
+            background: #e0efff;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Heat Scoreboard</h1>
+<p id="heat-info">Loading heat...</p>
+
+<table id="leaderboard">
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Competitor</th>
+            <th>Waves</th>
+            <th>Best Two</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody id="leaderboard-body">
+    </tbody>
+</table>
+
+<script>
+    const HEAT_ID = 1; // Change this to whichever heat you want to display
+
+    function fetchLeaderboard() {
+        fetch(`http://localhost:8000/spectator/heat/${HEAT_ID}`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("heat-info").innerText =
+                    `Heat ${data.heat.id} – ${data.heat.round} – Status: ${data.heat.status}`;
+
+                const tbody = document.getElementById("leaderboard-body");
+                tbody.innerHTML = "";
+
+                data.leaderboard.forEach((entry, index) => {
+                    const row = document.createElement("tr");
+
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${entry.name}</td>
+                        <td>${entry.waves.join(", ")}</td>
+                        <td>${entry.best_two.join(", ")}</td>
+                        <td><strong>${entry.total.toFixed(2)}</strong></td>
+                    `;
+
+                    tbody.appendChild(row);
+                });
+            });
+    }
+
+    // Initial load
+    fetchLeaderboard();
+
+    // WebSocket for live updates
+    const ws = new WebSocket("ws://localhost:8000/ws");
+
+    ws.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+
+        if (msg.type === "new_score") {
+            console.log("New score received:", msg.score);
+        }
+
+        if (msg.type === "leaderboard_update" && msg.heat_id === HEAT_ID) {
+            console.log("Leaderboard update triggered");
+            fetchLeaderboard();
+        }
+    };
+</script>
+
+</body>
+</html>
