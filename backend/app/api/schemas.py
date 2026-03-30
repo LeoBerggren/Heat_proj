@@ -28,7 +28,8 @@ class JudgeBase(BaseModel):
     name: str
     
 class JudgeCreate(JudgeBase):
-    pass
+    name: str | None = None
+
 
 class JudgeRead(JudgeBase):
     id: int
@@ -108,3 +109,25 @@ class ScoreRead(ScoreBase):
 
     class Config:
         orm_mode = True
+
+#JUDGE SCORING
+class JudgeScoreCreate(BaseModel):
+    judge_id: int
+    heat_id: int
+    competitor_id: int
+    wave: int
+    score: float
+
+class JudgeScoreEntry(BaseModel):
+    competitor_id: int
+    wave: int
+    score: float
+
+class JudgeBreakdownEntry(BaseModel):
+    judge_id: int
+    name: str | None
+    scores: list[JudgeScoreEntry]
+
+class JudgeBreakdownResponse(BaseModel):
+    heat_id: int
+    judges: list[JudgeBreakdownEntry]

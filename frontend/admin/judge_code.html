@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Set Judge Code</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        input, button { padding: 10px; margin: 5px; }
+    </style>
+</head>
+<body>
+
+<h1>Set Judge Login Code</h1>
+
+<input id="judgeCode" placeholder="Enter new judge code">
+<button onclick="saveCode()">Save Code</button>
+
+<script>
+const API = "http://localhost:8000/admin/settings";
+
+function saveCode() {
+    const code = document.getElementById("judgeCode").value;
+
+    fetch(`${API}/judge_code`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ value: code })
+    }).then(() => alert("Judge code updated"));
+}
+</script>
+
+</body>
+</html>

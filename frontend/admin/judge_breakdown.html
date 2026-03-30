@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Judge Breakdown</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background: #eee; }
+    </style>
+</head>
+<body>
+<h1>Judge Breakdown</h1>
+<h2 id="heat-title"></h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Judge</th>
+            <th>Competitor</th>
+            <th>Wave</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody id="breakdown-body"></tbody>
+</table>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const heatId = params.get("heat");
+
+fetch(`http://localhost:8000/admin/heats/${heatId}/judge_breakdown`)
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("heat-title").innerText =
+            `Heat ${data.heat_id} – Judge Breakdown`;
+
+        const tbody = document.getElementById("breakdown-body");
+        tbody.innerHTML = "";
+
+        data.judges.forEach(j => {
+            j.scores.forEach(s => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${j.name || "Judge " + j.judge_id}</td>
+                    <td>${s.competitor_id}</td>
+                    <td>${s.wave}</td>
+                    <td>${s.score.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+    });
+</script>
+</body>
+</html>

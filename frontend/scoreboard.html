@@ -46,7 +46,9 @@
 </table>
 
 <script>
-    const HEAT_ID = 1; // Change this to whichever heat you want to display
+    const params = new URLSearchParams(window.location.search);
+    const HEAT_ID = params.get("heat") || 1;
+    fetchLeaderboard(HEAT_ID); 
 
     function fetchLeaderboard() {
         fetch(`http://localhost:8000/spectator/heat/${HEAT_ID}`)

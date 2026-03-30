@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Judge Login</title>
+    <style>
+        body { font-family: Arial; padding: 40px; max-width: 400px; margin: auto; }
+        input, button { width: 100%; padding: 12px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<h1>Judge Login</h1>
+
+<label>Judge Code:</label>
+<input id="code">
+
+<label>Your Name:</label>
+<input id="name">
+
+<button onclick="login()">Login</button>
+
+<div id="error" style="color:red;"></div>
+
+<script>
+const API = "http://localhost:8000";
+
+async function login() {
+    const code = document.getElementById("code").value.trim();
+    const name = document.getElementById("name").value.trim();
+
+    const res = await fetch(`${API}/admin/settings/judge_code`);
+    const data = await res.json();
+
+    if (code !== data.value) {
+        document.getElementById("error").innerText = "Invalid judge code";
+        return;
+    }
+
+    // Create judge dynamically
+    const judgeRes = await fetch(`${API}/judge/judges`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name })
+    });
+
+    const judge = await judgeRes.json();
+
+    localStorage.setItem("judge_id", judge.id);
+    window.location = "judge_dashboard.html";
+}
+</script>
+
+</body>
+</html>

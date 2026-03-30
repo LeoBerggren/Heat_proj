@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Judges</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; }
+        th { background: #eee; }
+        input, button { padding: 8px; margin: 5px; }
+    </style>
+</head>
+<body>
+
+<h1>Manage Judges</h1>
+
+
+<h2>Existing Judges</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    <tbody id="judgeTable"></tbody>
+</table>
+
+<script>
+const API = "http://localhost:8000/judge";
+
+//OBSOLETE NOW
+/*
+function generateCode() {
+    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+    document.getElementById("judgeCode").value = code;
+}
+*/
+/*
+function createJudge() {
+    const name = document.getElementById("judgeName").value;
+    const code = document.getElementById("judgeCode").value;
+
+    fetch(`${API}/judges`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, code })
+    })
+    .then(() => loadJudges());
+}
+*/
+
+function loadJudges() {
+    fetch(`${API}/judges`)
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById("judgeTable");
+            tbody.innerHTML = "";
+
+            data.forEach(j => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${j.id}</td>
+                    <td>${j.name || ""}</td>
+                    <td><button onclick="deleteJudge(${j.id})">Delete</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+function deleteJudge(id) {
+    fetch(`${API}/judges/${id}`, { method: "DELETE" })
+        .then(() => loadJudges());
+}
+
+loadJudges();
+</script>
+
+</body>
+</html>

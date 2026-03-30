@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Competitors to Heat</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        select, button { padding: 8px; margin: 5px; }
+        table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background: #eee; }
+    </style>
+</head>
+<body>
+
+<h1>Assign Competitors to Heat</h1>
+
+<label>Select Heat:</label>
+<select id="heatSelect" onchange="loadHeatCompetitors()"></select>
+
+<h2>Competitors in this Heat</h2>
+<table>
+    <thead>
+        <tr><th>ID</th><th>Name</th><th>Remove</th></tr>
+    </thead>
+    <tbody id="assignedTable"></tbody>
+</table>
+
+<h2>Add Competitor</h2>
+<select id="competitorSelect"></select>
+<button onclick="addCompetitor()">Add to Heat</button>
+
+<script>
+const API_HEATS = "http://localhost:8000/admin/heats";
+const API_COMPETITORS = "http://localhost:8000/admin/competitors";
+const urlParams = new URLSearchParams(window.location.search);
+const preselectedHeat = urlParams.get("heat");
+
+function loadHeats() {
+    fetch(API_HEATS + "/")
+        .then(res => res.json())
+        .then(data => {
+            const select = document.getElementById("heatSelect");
+            select.innerHTML = "";
+            data.forEach(h => {
+                const opt = document.createElement("option");
+                opt.value = h.id;
+                opt.textContent = `${h.id} – ${h.round}`;
+                select.appendChild(opt);
+                if (preselectedHeat && Number(preselectedHeat) === h.id) {
+                    opt.selected = true;
+                }
+
+                select.appendChild(opt);            
+            });
+            loadHeatCompetitors();
+        });
+}
+
+function loadCompetitors() {
+    fetch(API_COMPETITORS + "/")
+        .then(res => res.json())
+        .then(data => {
+            const select = document.getElementById("competitorSelect");
+            select.innerHTML = "";
+            data.forEach(c => {
+                const opt = document.createElement("option");
+                opt.value = c.id;
+                opt.textContent = c.name;
+                select.appendChild(opt);
+            });
+        });
+}
+
+function loadHeatCompetitors() {
+    const heatId = document.getElementById("heatSelect").value;
+    fetch(`${API_HEATS}/${heatId}/competitors`)
+        .then(res => res.json())
+        .then(data => {
+            const table = document.getElementById("assignedTable");
+            table.innerHTML = "";
+            data.forEach(c => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${c.id}</td>
+                    <td>${c.name}</td>
+                    <td><button onclick="removeCompetitor(${c.id})">Remove</button></td>
+                `;
+                table.appendChild(row);
+            });
+        });
+}
+
+function addCompetitor() {
+    const heatId = document.getElementById("heatSelect").value;
+    const competitorId = document.getElementById("competitorSelect").value;
+
+    fetch(`${API_HEATS}/${heatId}/competitors/${competitorId}`, {
+        method: "POST"
+    }).then(() => loadHeatCompetitors());
+}
+
+function removeCompetitor(id) {
+    const heatId = document.getElementById("heatSelect").value;
+
+    fetch(`${API_HEATS}/${heatId}/competitors/${id}`, {
+        method: "DELETE"
+    }).then(() => loadHeatCompetitors());
+}
+
+loadHeats();
+loadCompetitors();
+</script>
+
+</body>
+</html>

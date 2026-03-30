@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Judge Dashboard</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        h1, h2 { margin-bottom: 10px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; }
+        th { background: #eee; }
+        button { padding: 8px 12px; margin: 5px; cursor: pointer; }
+        #judge-info { font-size: 18px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<h1>Judge Dashboard</h1>
+<div id="judge-info">Loading judge info...</div>
+
+<h2>Available Heats</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Round</th>
+            <th>Status</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="heats-table"></tbody>
+</table>
+
+<script>
+const API_BASE = "http://localhost:8000";
+const judgeId = localStorage.getItem("judge_id");
+
+if (!judgeId) {
+    alert("You must log in as a judge first.");
+    window.location = "judge_login.html";
+}
+
+function loadJudgeInfo() {
+    fetch(`${API_BASE}/judge/judges/${judgeId}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("judge-info").innerText =
+                `Logged in as: ${data.name || "Judge " + data.id}`;
+        });
+}
+
+function loadHeats() {
+    fetch(`${API_BASE}/admin/heats/`)
+        .then(res => res.json())
+        .then(data => {
+            const tbody = document.getElementById("heats-table");
+            tbody.innerHTML = "";
+
+            data.forEach(h => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${h.id}</td>
+                    <td>${h.round}</td>
+                    <td>${h.status}</td>
+                    <td>${h.start_time || ""}</td>
+                    <td>${h.end_time || ""}</td>
+                    <td>
+                        <button onclick="volunteer(${h.id})">Score This Heat</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+function volunteer(heatId) {
+    fetch(`${API_BASE}/judge/volunteer/${judgeId}/heat/${heatId}`, {
+        method: "POST"
+    })
+    .then(res => res.json())
+    .then(() => {
+        window.location = `judge_scoring.html?heat=${heatId}`;
+    });
+}
+
+loadJudgeInfo();
+loadHeats();
+</script>
+
+</body>
+</html>

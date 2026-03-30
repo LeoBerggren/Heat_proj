@@ -31,7 +31,7 @@
             <th>Status</th>
             <th>Start</th>
             <th>End</th>
-            <th>Delete</th>
+            <th>Manage</th>
         </tr>
     </thead>
     <tbody id="heatTable"></tbody>
@@ -55,11 +55,28 @@ function loadHeats() {
                     <td>${h.status}</td>
                     <td>${h.start_time || ""}</td>
                     <td>${h.end_time || ""}</td>
-                    <td><button onclick="deleteHeat(${h.id})">Delete</button></td>
+                    <td>
+                        <button onclick="deleteHeat(${h.id})">Delete</button>
+                        <button onclick="assignCompetitors(${h.id})">Assign Competitors</button>
+                        <button onclick="viewHeat(${h.id})">View Heat</button>
+                        <button onclick="viewJudgeBreakdown(${h.id})">Judge Breakdown</button>
+                    </td>
                 `;
                 table.appendChild(row);
             });
         });
+}
+
+function assignCompetitors(heatId) {
+    window.location = `assign_competitors.html?heat=${heatId}`;
+}
+
+function viewHeat(heatId) {
+    window.location = `../scoreboard.html?heat=${heatId}`;
+}
+
+function viewJudgeBreakdown(heatId) {
+    window.location = `judge_breakdown.html?heat=${heatId}`;
 }
 
 function createHeat() {

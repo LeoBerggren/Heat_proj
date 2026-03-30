@@ -4,6 +4,7 @@ from fastapi import FastAPI, WebSocket
 from app.models.score import Score
 from app.db import engine, Base, SessionLocal
 from fastapi.middleware.cors import CORSMiddleware
+from app.models.settings import Setting
 
 
 
@@ -19,6 +20,10 @@ from app.api.spectator import router as spectators_router
 from app.api.admin import router as admin_router
 from app.api.admin_competitors import router as admin_competitors_router
 from app.api.admin_heats import router as admin_heats_router
+from app.api.admin_heat_assignments import router as admin_heat_assignments_router
+from app.api.judges import router as judge_router
+from app.api.admin_heats import admin_judge_router
+from app.api.admin_settings import router as admin_settings_router
 
 # Import ALL models so SQLAlchemy knows them
 from app.models.event import Event
@@ -40,6 +45,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(admin_settings_router)
+app.include_router(admin_judge_router)
+app.include_router(judge_router)
+app.include_router(admin_heat_assignments_router)
 app.include_router(admin_heats_router)
 app.include_router(admin_competitors_router)
 app.include_router(spectators_router)
@@ -50,8 +59,16 @@ app.include_router(events_router)
 app.include_router(heats_router)
 app.include_router(competitors_router)
 app.include_router(admin_router)
-
 app.include_router(websocket_router)
+
+@app.on_event("startup")
+def seed_judge_code():
+    db = SessionLocal()
+    setting = db.query(Setting).filter(Setting.key == "judge_code").first()
+    if not setting:
+        db.add(Setting(key="judge_code", value="SURF2025"))
+        db.commit()
+    db.close()
 
 @app.get("/")
 def root():
