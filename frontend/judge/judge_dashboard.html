@@ -76,14 +76,17 @@ function loadHeats() {
 }
 
 function volunteer(heatId) {
+    localStorage.setItem("current_heat_id", heatId);
+
     fetch(`${API_BASE}/judge/volunteer/${judgeId}/heat/${heatId}`, {
         method: "POST"
     })
     .then(res => res.json())
     .then(() => {
-        window.location = `judge_scoring.html?heat=${heatId}`;
+        window.location = "judge_scoring.html";
     });
 }
+
 
 loadJudgeInfo();
 loadHeats();

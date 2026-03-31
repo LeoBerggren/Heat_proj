@@ -8,7 +8,29 @@ from app.models.heat import Heat
 from app.models.score import Score
 from app.models.competitor import Competitor
 
+print("Loaded judges router")
+
 router = APIRouter(prefix="/judge", tags=["Judges"])
+
+#GET Heat assigned to Judge for scoring
+@router.get("/{judge_id}/current_heat")
+def get_current_heat(judge_id: int, db: Session = Depends(get_db)):
+    # Get the most recent heat assignment
+    link = (
+        db.query(JudgeHeat)
+        .filter(JudgeHeat.judge_id == judge_id)
+        .order_by(JudgeHeat.id.desc())
+        .first()
+    )
+
+    if not link:
+        raise HTTPException(status_code=404, detail="Judge not assigned to any heat")
+
+    heat = db.query(Heat).filter(Heat.id == link.heat_id).first()
+    if not heat:
+        raise HTTPException(status_code=404, detail="Heat not found")
+
+    return heat
 
 
 #JUDGE HEAT SELECTION

@@ -4,6 +4,9 @@ from sqlalchemy.orm import Session
 from app.db import get_db
 from app.models.heat import Heat
 from app.api.schemas import HeatCreate, HeatRead
+from app.models.heat_competitor import HeatCompetitor
+from app.models.competitor import Competitor
+
 
 router = APIRouter()
 
@@ -21,6 +24,18 @@ def create_heat(data: HeatCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(heat)
     return heat
+
+#Gets heat competitors
+@router.get("/heats/{heat_id}/competitors")
+def get_competitors_in_heat(heat_id: int, db: Session = Depends(get_db)):
+    competitors = (
+        db.query(Competitor)
+        .join(HeatCompetitor, HeatCompetitor.competitor_id == Competitor.id)
+        .filter(HeatCompetitor.heat_id == heat_id)
+        .all()
+    )
+
+    return competitors
 
 # READ ALL
 @router.get("/heats", response_model=list[HeatRead])

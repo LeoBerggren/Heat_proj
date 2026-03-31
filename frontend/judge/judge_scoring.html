@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Judge Scoring</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .competitor-card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+        input { width: 60px; padding: 5px; margin: 5px; }
+        button { padding: 8px 12px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<h1 id="heatTitle">Loading heat...</h1>
+<h3 id="judgeName"></h3>
+
+<div id="competitors"></div>
+
+<script>
+const API = "http://localhost:8000";
+const judgeId = localStorage.getItem("judge_id");
+const judgeName = localStorage.getItem("judge_name");
+document.getElementById("judgeName").innerText = "Judge: " + judgeName;
+
+async function loadHeat() {
+    const heatId = localStorage.getItem("current_heat_id");
+
+    if (!heatId) {
+        alert("No heat selected.");
+        return;
+    }
+
+    const res = await fetch(`${API}/heats/${heatId}`);
+    const heat = await res.json();
+
+    document.getElementById("heatTitle").innerText = `Heat ${heatId}`;
+    loadCompetitors(heatId);
+}
+
+async function loadCompetitors(heatId) {
+    const container = document.getElementById("competitors");
+    container.innerHTML = "";
+
+    const res = await fetch(`${API}/heats/${heatId}/competitors`);
+    const competitors = await res.json();
+
+    competitors.forEach(c => {
+        const card = createCompetitorCard(c, heatId);
+        container.appendChild(card);
+
+        // Now that the card is in the DOM, add the first wave input
+        addWaveInput(c.id);
+    });
+}
+
+function createCompetitorCard(c, heatId) {
+    const div = document.createElement("div");
+    div.className = "competitor-card";
+
+    div.innerHTML = `<h2>${c.name}</h2>`;
+
+    const wavesDiv = document.createElement("div");
+    wavesDiv.id = `waves-${c.id}`;
+    div.appendChild(wavesDiv);
+
+    const addBtn = document.createElement("button");
+    addBtn.innerText = "+ Add Wave";
+    addBtn.onclick = () => addWaveInput(c.id);
+    div.appendChild(addBtn);
+
+    const submitBtn = document.createElement("button");
+    submitBtn.innerText = "Submit Scores";
+    submitBtn.onclick = () => submitScores(c.id, heatId);
+    div.appendChild(submitBtn);
+
+    return div;
+}
+
+function addWaveInput(competitorId) {
+    const wavesDiv = document.getElementById(`waves-${competitorId}`);
+    const input = document.createElement("input");
+    input.type = "number";
+    input.step = "0.1";
+    input.placeholder = `Wave ${wavesDiv.children.length + 1}`;
+    wavesDiv.appendChild(input);
+}
+
+async function submitScores(competitorId, heatId) {
+    const wavesDiv = document.getElementById(`waves-${competitorId}`);
+    const waveScores = Array.from(wavesDiv.children)
+        .map(input => parseFloat(input.value))
+        .filter(v => !isNaN(v));
+
+    const body = {
+        judge_id: judgeId,
+        competitor_id: competitorId,
+        heat_id: heatId,
+        wave_scores: waveScores
+    };
+
+    await fetch(`${API}/scores`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+    });
+
+    alert("Scores submitted");
+}
+
+loadHeat();
+</script>
+
+</body>
+</html>

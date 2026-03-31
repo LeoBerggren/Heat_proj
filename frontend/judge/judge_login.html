@@ -47,6 +47,7 @@ async function login() {
     const judge = await judgeRes.json();
 
     localStorage.setItem("judge_id", judge.id);
+    localStorage.setItem("judge_name", name);
     window.location = "judge_dashboard.html";
 }
 </script>

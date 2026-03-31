@@ -21,7 +21,6 @@ from app.api.admin import router as admin_router
 from app.api.admin_competitors import router as admin_competitors_router
 from app.api.admin_heats import router as admin_heats_router
 from app.api.admin_heat_assignments import router as admin_heat_assignments_router
-from app.api.judges import router as judge_router
 from app.api.admin_heats import admin_judge_router
 from app.api.admin_settings import router as admin_settings_router
 
@@ -47,7 +46,6 @@ app.add_middleware(
 
 app.include_router(admin_settings_router)
 app.include_router(admin_judge_router)
-app.include_router(judge_router)
 app.include_router(admin_heat_assignments_router)
 app.include_router(admin_heats_router)
 app.include_router(admin_competitors_router)
