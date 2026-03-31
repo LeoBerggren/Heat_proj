@@ -33,6 +33,8 @@
     <tbody id="heats-table"></tbody>
 </table>
 
+<button onclick="goHome()">Home</button>
+
 <script>
 const API_BASE = "http://localhost:8000";
 const judgeId = localStorage.getItem("judge_id");
@@ -87,6 +89,10 @@ function volunteer(heatId) {
     });
 }
 
+function goHome() {
+    localStorage.removeItem("current_heat_id");
+    window.location = "../index.html";
+}
 
 loadJudgeInfo();
 loadHeats();

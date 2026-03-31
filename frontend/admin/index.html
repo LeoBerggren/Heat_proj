@@ -49,6 +49,8 @@
     <button onclick="window.location='judge_code.html'">Set Judge Code</button>
 </div>
 
+<button onclick="goHome()">Home</button>
+
 <script>
 function startHeat() {
     const id = document.getElementById("heatId").value;
@@ -67,6 +69,10 @@ function refreshLeaderboard() {
             // Broadcast leaderboard update
             fetch(`http://localhost:8000/admin/broadcast/leaderboard/${id}`, { method: "POST" });
         });
+}
+
+function goHome() {
+    window.location = "../index.html";
 }
 </script>
 

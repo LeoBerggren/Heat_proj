@@ -28,9 +28,14 @@
     <tbody id="judgeTable"></tbody>
 </table>
 
+<button onclick="goBackToAdmin()">Back to Admin Dashboard</button>
+
 <script>
 const API = "http://localhost:8000/judge";
 
+function goBackToAdmin() {
+    window.location = "index.html";
+}
 //OBSOLETE NOW
 /*
 function generateCode() {

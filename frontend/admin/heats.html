@@ -37,8 +37,14 @@
     <tbody id="heatTable"></tbody>
 </table>
 
+<button onclick="goBackToAdmin()">Back to Admin Dashboard</button>
+
 <script>
 const API = "http://localhost:8000/admin/heats";
+
+function goBackToAdmin() {
+    window.location = "index.html";
+}
 
 function loadHeats() {
     fetch(API)

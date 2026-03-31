@@ -113,8 +113,17 @@ async function submitScores(competitorId, heatId) {
     alert("Scores submitted");
 }
 
+function goBackToJudgeDashboard() {
+    // Do NOT clear judge_id — they are still logged in
+    // Do NOT clear scores or heat data
+    // Only clear the selected heat
+    localStorage.removeItem("current_heat_id");
+    window.location = "judge_dashboard.html";
+}
+
 loadHeat();
 </script>
 
+<button onclick="goBackToJudgeDashboard()">Back to Dashboard</button>
 </body>
 </html>

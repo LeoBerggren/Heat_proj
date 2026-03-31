@@ -29,12 +29,25 @@
 <h2>Add Competitor</h2>
 <select id="competitorSelect"></select>
 <button onclick="addCompetitor()">Add to Heat</button>
+<br><br>
+<button onclick="goBackToHeats()">Go to Manage Heats</button>
+<button onclick="goBackToAdmin()">Go to Admin Dashboard</button>
+
 
 <script>
 const API_HEATS = "http://localhost:8000/admin/heats";
 const API_COMPETITORS = "http://localhost:8000/admin/competitors";
 const urlParams = new URLSearchParams(window.location.search);
 const preselectedHeat = urlParams.get("heat");
+
+function goBackToHeats() {
+    window.location = "heats.html";
+}
+
+function goBackToAdmin() {
+    window.location = "index.html";
+}
+
 
 function loadHeats() {
     fetch(API_HEATS + "/")

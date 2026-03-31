@@ -15,5 +15,14 @@
 <button onclick="window.location='admin/index.html'">Admin Dashboard</button>
 <button onclick="window.location='judge/judge_login.html'">Judge Login</button>
 
+<button onclick="resetSession()">Reset Session</button>
+
+<script>
+function resetSession() {
+    localStorage.clear();
+    window.location.reload();
+}
+</script>
+
 </body>
 </html>
