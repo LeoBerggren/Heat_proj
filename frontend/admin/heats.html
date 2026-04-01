@@ -20,6 +20,7 @@
     <input id="round" placeholder="Round name (e.g. Quarterfinal 1)">
     <input id="start" type="datetime-local">
     <input id="end" type="datetime-local">
+    <input id="duration" type="number" min="1" placeholder="Duration (minutes)">
     <button onclick="createHeat()">Create Heat</button>
 </div>
 
@@ -87,6 +88,7 @@ function viewJudgeBreakdown(heatId) {
 
 function createHeat() {
     const round = document.getElementById("round").value;
+    const duration = parseInt(document.getElementById("duration").value);
     const start = document.getElementById("start").value;
     const end = document.getElementById("end").value;
 
@@ -95,11 +97,13 @@ function createHeat() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             round,
+            duration_minutes: duration,
             start_time: start || null,
             end_time: end || null
         })
     }).then(() => {
         document.getElementById("round").value = "";
+        document.getElementById("duration").value = "";
         loadHeats();
     });
 }

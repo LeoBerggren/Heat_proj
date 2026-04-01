@@ -22,6 +22,9 @@
 
 <div id="competitors"></div>
 
+<div id="scoring-timer"></div>
+
+<script src="../js/timer.js"></script>
 <script>
 const API = "http://localhost:8000";
 const judgeId = localStorage.getItem("judge_id");
@@ -120,6 +123,21 @@ function goBackToJudgeDashboard() {
     localStorage.removeItem("current_heat_id");
     window.location = "judge_dashboard.html";
 }
+
+const heatId = localStorage.getItem("current_heat_id");
+
+fetch("http://localhost:8000/admin/heats")
+    .then(res => res.json())
+    .then(heats => {
+        const running = heats.find(h => h.status === "running");
+
+        if (running && running.id == heatId) {
+            startHeatTimer("scoring-timer", heatId);
+        } else {
+            document.getElementById("scoring-timer").innerText =
+                "This heat is not currently running.";
+        }
+    });
 
 loadHeat();
 </script>

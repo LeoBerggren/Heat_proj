@@ -17,11 +17,56 @@
 
 <button onclick="resetSession()">Reset Session</button>
 
+<br>
+<label for="heatSelect">Select Heat:</label>
+<select id="heatSelect"></select>
+
+<button onclick="openScoreboard()">View Scoreboard</button>
+<h2 id="frontpage-timer-title">Heat Timer</h2>
+<div id="frontpage-timer"></div>
+
+<script src="./js/timer.js"></script>
 <script>
+const API = "http://localhost:8000";
+
+// Load heats into dropdown
+fetch(`${API}/admin/heats/`)
+    .then(res => res.json())
+    .then(heats => {
+        const select = document.getElementById("heatSelect");
+        heats.forEach(h => {
+            const opt = document.createElement("option");
+            opt.value = h.id;
+            opt.textContent = `Heat ${h.id} – Round ${h.round}`;
+            select.appendChild(opt);
+        });
+    });
+
+function openScoreboard() {
+    const heatId = document.getElementById("heatSelect").value;
+    window.location = `scoreboard.html?heat=${heatId}`;
+}
+
 function resetSession() {
     localStorage.clear();
     window.location.reload();
 }
+
+fetch("http://localhost:8000/admin/heats") 
+    .then(res => res.json())
+    .then(heats => {
+        const running = heats.find(h => h.status === "running");
+        if (running) {
+            document.getElementById("frontpage-timer-title").innerText =
+                `Heat ${running.id} Timer`;
+            startHeatTimer("frontpage-timer", running.id);
+        } else {
+            document.getElementById("frontpage-timer").innerText = "No heat running";
+        }
+
+    });
+
+
 </script>
 
 </body>

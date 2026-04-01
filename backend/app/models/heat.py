@@ -10,4 +10,5 @@ class Heat(Base):
     round = Column(String)
     start_time = Column(DateTime, nullable=True)
     end_time = Column(DateTime, nullable=True)
+    duration_minutes = Column(Integer, default=20) #default heat duration = 20min
     status = Column(String, default="pending")

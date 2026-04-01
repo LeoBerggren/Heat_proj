@@ -58,12 +58,14 @@ class EventRead(EventBase):
 class HeatBase(BaseModel):
     event_id: int
     round: str
+    duration_minutes: int
     start_time: datetime | None = None
     end_time: datetime | None = None
     status: str = "pending"
 
 class HeatCreate(BaseModel):
     round: str
+    duration_minutes: int
     start_time: datetime | None = None
     end_time: datetime | None = None
     event_id: int | None = None   # optional for now
@@ -72,6 +74,7 @@ class HeatRead(BaseModel):
     id: int
     event_id: int | None = None
     round: str
+    duration_minutes: int
     start_time: datetime | None = None
     end_time: datetime | None = None
     status: str

@@ -49,19 +49,34 @@
     <button onclick="window.location='judge_code.html'">Set Judge Code</button>
 </div>
 
+<h2 id="admin-timer-title">Current Heat Timer</h2>
+<div id="admin-timer"></div>
+
 <button onclick="goHome()">Home</button>
 
-<script>
+<script src="../js/timer.js"></script>
+<script>    
 function startHeat() {
     const id = document.getElementById("heatId").value;
-    fetch(`http://localhost:8000/heats/${id}/start`, { method: "POST" });
+    fetch(`http://localhost:8000/admin/heats/${id}/start`, {
+        method: "POST"
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("Start heat response:", data);
+        location.reload();
+    });
 }
 
 function finishHeat() {
     const id = document.getElementById("heatId").value;
-    fetch(`http://localhost:8000/heats/${id}/finish`, { method: "POST" });
+    fetch(`http://localhost:8000/admin/heats/${id}/finish`, {
+        method: "POST"
+    }).then(() => {
+        alert("Heat finished");
+        location.reload();
+    });
 }
-
 function refreshLeaderboard() {
     const id = document.getElementById("heatId").value;
     fetch(`http://localhost:8000/spectator/heat/${id}`)
@@ -74,6 +89,20 @@ function refreshLeaderboard() {
 function goHome() {
     window.location = "../index.html";
 }
+
+fetch("http://localhost:8000/admin/heats")
+    .then(res => res.json())
+    .then(heats => {
+        const running = heats.find(h => h.status === "running");
+        if (running) {
+            document.getElementById("admin-timer-title").innerText =
+                `Heat ${running.id} Timer`;
+            startHeatTimer("admin-timer", running.id);
+        } else {
+            document.getElementById("admin-timer").innerText = "No heat running";
+        }
+    });
+
 </script>
 
 </body>

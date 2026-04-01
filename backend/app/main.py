@@ -23,6 +23,8 @@ from app.api.admin_heats import router as admin_heats_router
 from app.api.admin_heat_assignments import router as admin_heat_assignments_router
 from app.api.admin_heats import admin_judge_router
 from app.api.admin_settings import router as admin_settings_router
+from app.api.timer import router as timer_router
+
 
 # Import ALL models so SQLAlchemy knows them
 from app.models.event import Event
@@ -44,6 +46,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(timer_router)
 app.include_router(admin_settings_router)
 app.include_router(admin_judge_router)
 app.include_router(admin_heat_assignments_router)

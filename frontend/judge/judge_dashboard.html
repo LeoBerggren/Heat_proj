@@ -33,8 +33,12 @@
     <tbody id="heats-table"></tbody>
 </table>
 
+<h2 id="judge-timer-title">Heat Timer</h2>
+<div id="judge-timer"></div>
+
 <button onclick="goHome()">Home</button>
 
+<script src="../js/timer.js"></script>
 <script>
 const API_BASE = "http://localhost:8000";
 const judgeId = localStorage.getItem("judge_id");
@@ -93,6 +97,33 @@ function goHome() {
     localStorage.removeItem("current_heat_id");
     window.location = "../index.html";
 }
+
+fetch("http://localhost:8000/admin/heats")
+    .then(res => res.json())
+    .then(heats => {
+        const running = heats.find(h => h.status === "running");
+        if (running) {
+            startHeatTimer("judge-timer", running.id);
+        } else {
+            document.getElementById("judge-timer").innerText = "No heat running";
+        }
+    });
+
+    fetch("http://localhost:8000/admin/heats")
+    .then(res => res.json())
+    .then(heats => {
+        const running = heats.find(h => h.status === "running");
+        if (running) {
+            document.getElementById("judge-timer-title").innerText =
+                `Heat ${running.id} Timer`;
+
+            startHeatTimer("judge-timer", running.id);
+        } else {
+            document.getElementById("judge-timer-title").innerText =
+                "No Heat Running";
+            document.getElementById("judge-timer").innerText = "";
+        }
+    });
 
 loadJudgeInfo();
 loadHeats();

@@ -18,6 +18,7 @@ def create_heat(data: HeatCreate, db: Session = Depends(get_db)):
         round=data.round,
         start_time=data.start_time,
         end_time=data.end_time,
+        duration=data.duration_minutes,
         status=data.status
     )
     db.add(heat)

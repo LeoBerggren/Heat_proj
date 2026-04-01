@@ -7,6 +7,7 @@ from app.api.schemas import HeatCreate, HeatRead
 from app.models.score import Score
 from app.models.judge import Judge
 from app.api.schemas import JudgeBreakdownResponse, JudgeBreakdownEntry, JudgeScoreEntry
+from datetime import datetime, timedelta
 
 router = APIRouter(prefix="/admin/heats", tags=["Admin Heats"])
 
@@ -67,6 +68,7 @@ def create_heat(data: HeatCreate, db: Session = Depends(get_db)):
         round=data.round,
         start_time=data.start_time,
         end_time=data.end_time,
+        duration_minutes=data.duration_minutes,
         status="pending"
     )
     db.add(heat)
@@ -83,4 +85,33 @@ def delete_heat(heat_id: int, db: Session = Depends(get_db)):
 
     db.delete(heat)
     db.commit()
+
     return {"message": "Heat deleted"}
+
+
+@router.post("/{heat_id}/start")
+def start_heat(heat_id: int, db: Session = Depends(get_db)):
+    heat = db.query(Heat).filter(Heat.id == heat_id).first()
+    if not heat:
+        raise HTTPException(status_code=404, detail="Heat not found")
+
+    heat.start_time = datetime.utcnow()
+    heat.end_time = heat.start_time + timedelta(minutes=heat.duration_minutes)
+    heat.status = "running"
+
+    db.commit()
+    db.refresh(heat)
+    return {"message": "Heat started", "heat_id": heat_id}
+
+
+@router.post("/{heat_id}/finish")
+def finish_heat(heat_id: int, db: Session = Depends(get_db)):
+    heat = db.query(Heat).filter(Heat.id == heat_id).first()
+    if not heat:
+        raise HTTPException(status_code=404, detail="Heat not found")
+
+    heat.status = "finished"
+    heat.end_time = datetime.utcnow()
+
+    db.commit()
+    return {"message": "Heat finished", "heat_id": heat_id}
