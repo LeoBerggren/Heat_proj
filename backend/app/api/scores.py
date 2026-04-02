@@ -23,24 +23,39 @@ async def submit_score(data: ScoreCreate, db: Session = Depends(get_db)):
     db.refresh(db_score)
 
     # Broadcast using the DB object, not the Pydantic input
-    await manager.broadcast({
-        "type": "new_score",
-        "score": {
-            "id": db_score.id,
-            "heat_id": db_score.heat_id,
-            "competitor_id": db_score.competitor_id,
-            "judge_id": db_score.judge_id,
-            "value": db_score.value,
-            "timestamp": db_score.timestamp.isoformat()
+    await manager.broadcast_to_heat(
+        heat_id=db_score.heat_id,
+        message={
+            "type": "new_score",
+            "score": {
+                "id": db_score.id,
+                "heat_id": db_score.heat_id,
+                "competitor_id": db_score.competitor_id,
+                "judge_id": db_score.judge_id,
+                "value": db_score.value,
+                "timestamp": db_score.timestamp.isoformat()
+            }
         }
-    })
+    )
+
    # 2. Broadcast that the leaderboard should update
-    await manager.broadcast({
-        "type": "leaderboard_update",
-        "heat_id": db_score.heat_id
-    })
+    await manager.broadcast_to_heat(
+        heat_id=db_score.heat_id,
+        message={
+            "type": "leaderboard_update",
+            "heat_id": db_score.heat_id
+        }
+    )
 
     return db_score
+
+@router.get("/scores/heats/{heat_id}/judges/{judge_id}/scores", response_model=list[ScoreRead])
+def get_scores_for_judge_in_heat(heat_id: int, judge_id: int, db: Session = Depends(get_db)):
+    return db.query(Score).filter(
+        Score.heat_id == heat_id,
+        Score.judge_id == judge_id
+    ).all()
+
 
 # READ ALL
 @router.get("/scores", response_model=list[ScoreRead])

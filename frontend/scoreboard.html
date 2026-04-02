@@ -80,7 +80,19 @@
     fetchLeaderboard();
 
     // WebSocket for live updates
-    const ws = new WebSocket("ws://localhost:8000/ws");
+    const ws = new WebSocket(`ws://localhost:8000/ws/heat/${HEAT_ID}`);
+    
+    ws.onopen = () => {
+        console.log("Connected to WebSocket for heat", HEAT_ID);
+    };
+
+    ws.onerror = (e) => {
+        console.error("WebSocket error:", e);
+    };
+
+    ws.onclose = () => {
+        console.warn("WebSocket closed");
+    };
 
     ws.onmessage = (event) => {
         const msg = JSON.parse(event.data);

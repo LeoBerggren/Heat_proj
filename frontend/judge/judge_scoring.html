@@ -29,6 +29,10 @@
 const API = "http://localhost:8000";
 const judgeId = localStorage.getItem("judge_id");
 const judgeName = localStorage.getItem("judge_name");
+
+const HEAT_ID = localStorage.getItem("current_heat_id");
+const JUDGE_ID = localStorage.getItem("judge_id");
+
 document.getElementById("judgeName").innerText = "Judge: " + judgeName;
 
 async function loadHeat() {
@@ -60,6 +64,8 @@ async function loadCompetitors(heatId) {
         // Now that the card is in the DOM, add the first wave input
         addWaveInput(c.id);
     });
+    loadExistingScores();
+
 }
 
 function createCompetitorCard(c, heatId) {
@@ -91,6 +97,7 @@ function addWaveInput(competitorId) {
     input.type = "number";
     input.step = "0.1";
     input.placeholder = `Wave ${wavesDiv.children.length + 1}`;
+    input.setAttribute("data-competitor", competitorId);
     wavesDiv.appendChild(input);
 }
 
@@ -100,18 +107,20 @@ async function submitScores(competitorId, heatId) {
         .map(input => parseFloat(input.value))
         .filter(v => !isNaN(v));
 
-    const body = {
-        judge_id: judgeId,
-        competitor_id: competitorId,
-        heat_id: heatId,
-        wave_scores: waveScores
-    };
+    for (const value of waveScores) {
+        const body = {
+            judge_id: judgeId,
+            competitor_id: competitorId,
+            heat_id: heatId,
+            value: value
+        };
 
-    await fetch(`${API}/scores`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-    });
+        await fetch(`${API}/scores`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
+    }
 
     alert("Scores submitted");
 }
@@ -138,6 +147,26 @@ fetch("http://localhost:8000/admin/heats")
                 "This heat is not currently running.";
         }
     });
+
+function loadExistingScores() {
+    fetch(`${API}/scores/heats/${HEAT_ID}/judges/${JUDGE_ID}/scores`)
+        .then(res => res.json())
+        .then(scores => {
+            scores.forEach(score => {
+                const wavesDiv = document.getElementById(`waves-${score.competitor_id}`);
+
+                // Ensure enough inputs exist
+                while (wavesDiv.children.length < score.wave_number) {
+                    addWaveInput(score.competitor_id);
+                }
+
+                // Fill the correct input
+                const input = wavesDiv.children[score.wave_number - 1];
+                input.value = score.value;
+            });
+        });
+}
+
 
 loadHeat();
 </script>

@@ -3,11 +3,12 @@ from app.websocket_manager import manager
 
 router = APIRouter()
 
-@router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await manager.connect(websocket)
+@router.websocket("/ws/heat/{heat_id}")
+async def websocket_endpoint(websocket: WebSocket, heat_id: int):
+    await manager.connect(heat_id, websocket)
     try:
         while True:
-            await websocket.receive_text()  # keep connection alive
+            await websocket.receive_text()  # keep alive
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
+        manager.disconnect(heat_id, websocket)
+

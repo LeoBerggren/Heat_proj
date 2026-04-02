@@ -46,6 +46,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(websocket_router)
 app.include_router(timer_router)
 app.include_router(admin_settings_router)
 app.include_router(admin_judge_router)
@@ -60,7 +61,6 @@ app.include_router(events_router)
 app.include_router(heats_router)
 app.include_router(competitors_router)
 app.include_router(admin_router)
-app.include_router(websocket_router)
 
 @app.on_event("startup")
 def seed_judge_code():
@@ -74,12 +74,3 @@ def seed_judge_code():
 @app.get("/")
 def root():
     return {"message": "Welcome to the Surf Live Scoring API!"}
-
-@app.get("/heats/{heat_id}")
-def get_heat(heat_id: int):
-    return {"heat_id": heat_id, "scores": []}
-
-@app.websocket("/ws/heat/{heat_id}")
-async def heat_updates(websocket: WebSocket, heat_id: int):
-    await websocket.accept()
-    await websocket.send_text(f"Connected to heat {heat_id}")
